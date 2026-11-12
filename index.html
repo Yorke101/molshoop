@@ -137,6 +137,34 @@ input#nameIn{font-family:inherit;font-size:22px;padding:10px 12px;background:rgb
 .kbtn:disabled{opacity:.35;cursor:default}
 .knote{color:var(--muted);font-size:16px;margin-top:12px}
 @media (max-width:640px){ .krow{grid-template-columns:1fr 1fr} }
+#fx{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.dmgnum{position:absolute;font-weight:800;font-size:22px;color:#fff;text-shadow:0 2px 4px #000,0 0 2px #000;transform:translate(-50%,-50%);animation:dmgUp .75s ease-out forwards;white-space:nowrap}
+.dmgnum.head{color:var(--ember);font-size:30px}
+@keyframes dmgUp{0%{opacity:1;transform:translate(-50%,-50%) scale(1.4)}20%{transform:translate(-50%,-70%) scale(1)}100%{opacity:0;transform:translate(-50%,-190%) scale(.9)}}
+.coin{position:absolute;width:15px;height:15px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff3a0,#f2b705 55%,#a87400);box-shadow:0 0 8px rgba(255,200,40,.8)}
+#callout{position:absolute;left:0;right:0;top:15%;text-align:center;font-family:'Creepster','Impact',fantasy;font-size:clamp(40px,7vw,86px);color:var(--ember);text-shadow:0 0 22px rgba(255,138,61,.6),0 4px 0 #3a1a04;opacity:0}
+#callout.go{animation:callPop 1.2s ease-out forwards}
+#callout.big{color:var(--eye);text-shadow:0 0 26px rgba(255,42,16,.7),0 4px 0 #3a0804}
+@keyframes callPop{0%{opacity:0;transform:scale(2.3)}12%{opacity:1;transform:scale(.94)}22%{transform:scale(1.06)}32%{transform:scale(1)}75%{opacity:1}100%{opacity:0;transform:scale(1.02)}}
+#combo{position:absolute;right:24px;top:38%;text-align:right;opacity:0;transition:opacity .2s;color:var(--muted);font-size:18px}
+#combo b{display:block;font-size:46px;font-weight:800;color:var(--ember);line-height:1}
+#combo .cbar{height:4px;background:var(--ember);margin-top:6px;width:130px;margin-left:auto;transform-origin:right center}
+#dmgdir{position:absolute;left:50%;top:50%;width:380px;height:380px;margin:-190px 0 0 -190px;border-radius:50%;opacity:0;
+  background:conic-gradient(from -32deg,rgba(230,20,0,.9) 0deg,rgba(230,20,0,.35) 32deg,rgba(230,20,0,0) 64deg,transparent 64deg);
+  -webkit-mask:radial-gradient(circle,transparent 60%,#000 62%,#000 71%,transparent 73%);mask:radial-gradient(circle,transparent 60%,#000 62%,#000 71%,transparent 73%)}
+#tut{position:absolute;left:50%;top:calc(50% + 110px);transform:translateX(-50%);background:rgba(0,0,0,.62);border:1px solid rgba(255,138,61,.5);border-radius:6px;padding:10px 20px;font-size:24px;font-weight:600;opacity:0;transition:opacity .3s;white-space:nowrap}
+#intro{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;transition:opacity .6s;cursor:pointer}
+#intro[hidden]{display:none}
+#intro p{margin:0;opacity:0;transition:opacity 1.1s}
+#intro1{font-size:clamp(22px,3.4vw,36px);color:var(--ink);font-style:italic}
+#intro2{font-family:'Creepster','Impact',fantasy;font-size:clamp(44px,8vw,96px);color:var(--eye);text-shadow:0 0 30px rgba(255,42,16,.5)}
+#intro.l1 #intro1,#intro.l2 #intro2{opacity:1}
+#introSkip{position:absolute;bottom:calc(24px + env(safe-area-inset-bottom,0px));font-size:16px;color:var(--muted)}
+details.ctrl{margin:0 0 20px}
+details.ctrl summary{cursor:pointer;color:var(--muted);font-size:18px;margin-bottom:10px}
+details.ctrl summary:hover{color:var(--ember)}
+.btn.play{font-size:30px;padding:14px 40px}
+@media (prefers-reduced-motion: reduce){ .dmgnum,#callout.go{animation-duration:.01s} }
 @media (max-width:560px){ .boards{grid-template-columns:1fr} }
 @media (prefers-reduced-motion: reduce){#msg,#toast,#fade,#rands{transition:none} #ammoPrompt{animation:none}}
 </style>
@@ -156,18 +184,25 @@ input#nameIn{font-family:inherit;font-size:22px;padding:10px 12px;background:rgb
   <div id="exitHint" hidden><span id="arrow">▲</span><span id="exitDist"></span></div>
   <div id="cross"></div>
   <div id="hitmark"></div>
+  <div id="dmgdir"></div>
+  <div id="callout"></div>
+  <div id="combo"><b id="comboN">x2</b><span data-en="combo">kombo</span><div class="cbar" id="comboBar"></div></div>
+  <div id="tut"></div>
   <div id="interact" hidden></div>
   <div id="ammoPrompt" hidden></div>
   <div id="msg"></div>
   <div id="toast"></div>
 </div>
+<div id="fx"></div>
 <div id="fade"></div>
+<div id="intro" hidden><p id="intro1"></p><p id="intro2"></p><span id="introSkip"></span></div>
 
 <div class="screen" id="start">
   <div class="card">
     <h1>Molshoop</h1>
     <div class="sub" data-en="Night of the Moles, Pretoria East">Nag van die Molle, Pretoria-Oos</div>
-    <p class="lead" data-en="Clear four yards of moles in the campaign, or see how long you last in endless mode. Every mole pays out in rand. Spend it at Oom Koos’s Co-op between rounds, and keep your stuff safe in the vault.">Maak vier erwe skoon van molle in die veldtog, of kyk hoe lank jy uithou in eindeloos. Elke mol betaal in rand. Spandeer dit by Oom Koos se Koöperasie tussen rondes, en bêre jou goed in die kluis.</p>
+    <p class="lead" data-en="The moles are back. Defend the yard.">Die molle is terug. Verdedig die erf.</p>
+    <details class="ctrl"><summary data-en="Controls">Kontroles</summary>
     <div class="keys">
       <kbd>WASD</kbd><span data-en="Move (Shift to sprint)">Beweeg (Shift om te hardloop)</span>
       <kbd>Space</kbd><span data-en="Jump onto couches, pews and the rugby stands">Spring op banke, kerkbanke en die rugbypawiljoen</span>
@@ -178,9 +213,9 @@ input#nameIn{font-family:inherit;font-size:22px;padding:10px 12px;background:rgb
       <kbd>E</kbd><span data-en="Open the vault (the safe inside the buildings)">Maak die kluis oop (die kluis binne die geboue)</span>
       <kbd>F</kbd><span data-en="Get in or out of the bakkie on the smallholding">Klim in of uit die bakkie op die plot</span>
       <kbd>M · P</kbd><span data-en="Music on or off · Pause">Musiek aan of af · Pouse</span>
-    </div>
+    </div></details>
     <div class="row">
-      <button class="btn" id="goCampaign" data-en="Campaign">Veldtog</button>
+      <button class="btn play" id="goCampaign" data-en="Play">Speel</button>
       <button class="btn ghost" id="goEndless" data-en="Endless">Eindeloos</button>
     </div>
     <div class="settings">
@@ -643,7 +678,8 @@ function makeMole(type){
 }
 function spawnMole(type, at){
   const T=MT[type], s=T.scale; let x=0,z=0,ok=false;
-  if (at){ for(let i=0;i<20;i++){ x=at.x+(Math.random()-.5)*7; z=at.z+(Math.random()-.5)*7; if(Math.abs(x)<A-2&&Math.abs(z)<A-2&&!blocked(x,z,0.8)){ ok=true; break; } } }
+  if (at && at.exact && Math.abs(at.x)<A-2 && Math.abs(at.z)<A-2 && !blocked(at.x,at.z,0.8)){ x=at.x; z=at.z; ok=true; }
+  else if (at){ for(let i=0;i<20;i++){ x=at.x+(Math.random()-.5)*7; z=at.z+(Math.random()-.5)*7; if(Math.abs(x)<A-2&&Math.abs(z)<A-2&&!blocked(x,z,0.8)){ ok=true; break; } } }
   else for (let i=0;i<50;i++){ const a=Math.random()*PI*2, r=(type==='grawer'?16:11)+Math.random()*20; x=player.x+Math.sin(a)*r; z=player.z+Math.cos(a)*r;
     if (Math.abs(x)>A-2||Math.abs(z)>A-2) continue; if (blocked(x,z,type==='boss'?1.6:0.8)) continue; ok=true; break; }
   if (!ok) return false;
@@ -674,7 +710,13 @@ function damageMole(m,n,dir){
 function killMole(m){
   m.state='dying'; m.t2=0; state.kills++;
   const d=Math.floor(diff());
-  addRands(m.T.coins + d + (m.boss?d*10:0));
+  combo = comboT>0 ? combo+1 : 1; comboT=COMBO_WIN; bestCombo=Math.max(bestCombo,combo); callout(combo);
+  const mult=1+0.25*Math.min(8,combo-1), coins=Math.round((m.T.coins + d + (m.boss?d*10:0))*mult);
+  state.rands+=coins; state.earned+=coins; spawnCoins(m.g.position,Math.min(7,2+Math.floor(coins/6)));
+  { const p=m.g.position, dx=p.x-player.x, dz=p.z-player.z, dd=Math.hypot(dx,dz)||1, pw=(m.boss?3:6)+Math.random()*3;
+    m.fly={vx:dx/dd*pw,vz:dz/dd*pw,vy:(m.boss?5:7)+Math.random()*3,sx:(Math.random()-.5)*14,sz:(Math.random()-.5)*14}; }
+  if (m.boss) slowMo=Math.max(slowMo,1.1);
+  else if (state.toSpawn===0 && !state.bossPending && !moles.some(o=>o!==m && o.state!=='dying')) slowMo=Math.max(slowMo,0.9);
   dirtBurst(m.g.position,m.boss?40:16); sfx.death(m.boss);
   if (m.type==='bom') m.pendingBoom=0.07;
   if (m.boss){ showMsg(TX('Die Groot Mol is dood!','The Big Mole is dead!'),2.2); addPickup('med',m.g.position.x,m.g.position.z); }
@@ -690,7 +732,7 @@ function explode(m){
   boomLight.position.set(p.x,1.5,p.z); boomLight.intensity=7;
   state.shake=Math.min(0.6,state.shake+0.4*Math.max(0.15,1-dp/25)); sfx.boom(dp);
   const R=3.8;
-  if (dp<R && state.playing) hurtPlayer(Math.round(m.dmg*(1-dp/R*0.6)));
+  if (dp<R && state.playing) hurtPlayer(Math.round(m.dmg*(1-dp/R*0.6)),p);
   for (const o of moles){ if(o===m||o.state==='dying') continue; const d=Math.hypot(o.g.position.x-p.x,o.g.position.z-p.z); if (d<R+0.5*o.s) damageMole(o,6,null); }
   m.g.visible=false;
 }
@@ -782,6 +824,7 @@ const sfx={
     else if (id==='pistol'){ metal(t,2800,0.25,0.04); gn(t+r*0.55,0.06,700,'lowpass',0.3); metal(t+r*0.55,2200,0.3,0.05); metal(t+r*0.8,3400,0.3,0.04); metal(t+r*0.86,2600,0.3,0.04); }
     else { metal(t,2400,0.3,0.05); gn(t+r*0.5,0.08,500,'lowpass',0.4); metal(t+r*0.5,1800,0.4,0.06); metal(t+r*0.78,3000,0.35,0.05); metal(t+r*0.84,2200,0.4,0.05); } },
   dry(){ if(!ac) return; metal(ac.currentTime,3600,0.25,0.025); },
+  callout(n){ const b=n>=5?330:440; [0,4,7,12].slice(0,Math.min(4,n)).forEach((k,i)=>tone('triangle',b*Math.pow(2,k/12),b*Math.pow(2,k/12)*1.01,0.18,0.09,i*0.06)); },
   headshot(){ tone('sine',2200,1500,0.07,0.09); tone('sine',3300,2600,0.05,0.05,0.02); },
   wave(){ tone('triangle',110,55,1.6,0.18); tone('triangle',165,82,1.6,0.1,0.15); },
   pickup(){ tone('triangle',660,990,0.15,0.15); tone('triangle',990,1320,0.15,0.12,0.1); },
@@ -919,7 +962,7 @@ function driveUpdate(dt){
         if (m.boss){ m.carCd=1; damageMole(m,10,null); v.speed*=-0.3; state.shake=Math.min(0.5,state.shake+0.25); sfx.thud(); }
         else { damageMole(m,99,null); v.speed*=0.92; sfx.thud(); } } } }
 }
-function jump(){ if(driving) return; if(player.grounded){ player.vy=6.6; player.grounded=false; sfx.jump(); } }
+function jump(){ if(driving) return; tutComplete('jump'); if(player.grounded){ player.vy=6.6; player.grounded=false; sfx.jump(); } }
 const keys={};
 let locked=false, fallback=false, holding=false, dragging=false, dragDist=0;
 if (window.matchMedia && matchMedia('(pointer:coarse)').matches) $('touchNote').hidden=false;
@@ -939,6 +982,43 @@ try{ $('nameIn').value=localStorage.getItem('molshoop-name')||''; }catch(e){}
 
 // ---------- HUD ----------
 let msgT=0, toastT=0, popT=0, hitT=0;
+let hitStop=0, slowMo=0, combo=0, comboT=0, bestCombo=0;
+const COMBO_WIN=2.6;
+function toScreen(x,y,z){ const v=new THREE.Vector3(x,y,z).project(camera); return {x:(v.x+1)/2*innerWidth,y:(1-v.y)/2*innerHeight,ok:v.z>-1&&v.z<1}; }
+function dmgNumber(m,n,head){
+  const p=m.g.position, sp=toScreen(p.x,p.y+0.7*m.s,p.z); if(!sp.ok) return;
+  const el=document.createElement('div'); el.className='dmgnum'+(head?' head':''); el.textContent=Math.max(1,Math.round(n))+(head?'!':'');
+  el.style.left=(sp.x+(Math.random()-.5)*30)+'px'; el.style.top=sp.y+'px'; $('fx').appendChild(el); setTimeout(()=>el.remove(),800);
+}
+function spawnCoins(pos,n){
+  const sp=toScreen(pos.x,pos.y+0.6,pos.z), r=$('rands').getBoundingClientRect(), tx=r.left+r.width/2, ty=r.top+r.height/2;
+  if (!sp.ok || !$('rands').offsetParent || !document.body.animate){ sfx.coin(); popRands(); return; }
+  for (let i=0;i<n;i++){
+    const c=document.createElement('div'); c.className='coin'; c.style.left=(sp.x-7)+'px'; c.style.top=(sp.y-7)+'px'; $('fx').appendChild(c);
+    const jx=(Math.random()-.5)*90, jy=-35-Math.random()*55;
+    const a=c.animate([{transform:'translate(0,0) scale(.6)'},{transform:`translate(${jx}px,${jy}px) scale(1.25)`,offset:0.32},{transform:`translate(${tx-sp.x}px,${ty-sp.y}px) scale(.55)`,opacity:0.85}],{duration:620+i*70,easing:'cubic-bezier(.45,0,.75,1)'});
+    a.onfinish=()=>{ c.remove(); if(i===n-1){ sfx.coin(); popRands(); } };
+  }
+}
+function popRands(){ $('rands').classList.add('pop'); popT=0.12; }
+const CALLS=[[2,'Dubbel klap!','Double klap!'],[3,'Driedubbel!','Triple klap!'],[4,'Vierdubbel!','Quad klap!'],[5,'Mol-moord!','Mole massacre!'],[7,'Mol-slagting!','Mole mayhem!']];
+function callout(n){
+  let txt=null, big=false;
+  for (const c of CALLS) if (c[0]===n) txt=TX(c[1],c[2]);
+  if (n>=10 && n%5===0){ let nm=''; try{ nm=localStorage.getItem('molshoop-name')||''; }catch(e){} txt=nm?TX(`${nm} is ONSTUITBAAR!`,`${nm} is UNSTOPPABLE!`):TX('ONSTUITBAAR!','UNSTOPPABLE!'); big=true; }
+  if (!txt) return;
+  const el=$('callout'); el.textContent=txt; el.className=''; void el.offsetWidth; el.className='go'+(big||n>=5?' big':'');
+  sfx.callout(n);
+}
+let tutDone={}, tutShown={}, tutKey=null, tutT=0, tutMoveFrom=null;
+try{ tutDone=JSON.parse(localStorage.getItem('molshoop-tut')||'{}'); }catch(e){}
+function tut(key,text,dur){ if(tutDone[key]||tutShown[key]) return; tutShown[key]=true; tutKey=key; const el=$('tut'); el.textContent=text; el.style.opacity=1; tutT=dur||6; }
+function tutComplete(key){ if(!tutDone[key]){ tutDone[key]=true; try{ localStorage.setItem('molshoop-tut',JSON.stringify(tutDone)); }catch(e){} } if(tutKey===key){ $('tut').style.opacity=0; tutKey=null; } }
+function showDmgDir(from){
+  const d=new THREE.Vector3(); camera.getWorldDirection(d);
+  const rel=Math.atan2(from.x-player.x,from.z-player.z)-Math.atan2(d.x,d.z);
+  const el=$('dmgdir'); el.style.transition='none'; el.style.opacity='1'; el.style.transform=`rotate(${-rel}rad)`; void el.offsetWidth; el.style.transition='opacity .9s ease-out'; el.style.opacity='0';
+}
 function showHit(cls){ const el=$('hitmark'); el.className=cls; el.style.opacity=1; hitT=0.14; }
 const noteCool={};
 function noteOnce(key,text,color){ const now=performance.now(); if(now-(noteCool[key]||0)<2500) return; noteCool[key]=now; showToast(text,1.8,color); }
@@ -1152,7 +1232,9 @@ function scatterAmmo(){
 }
 function startLevel(n){
   const def=buildScene((n-1)%LEVELS.length);
-  state.level=n; state.toSpawn=10+n*4; state.bossPending=n>=2; state.spawnT=2.5; state.cleared=false; state.exitUsed=false;
+  state.level=n; state.toSpawn=10+n*4; state.bossPending=n>=2; state.spawnT=2.5; state.cleared=false; state.exitUsed=false; combo=0; comboT=0;
+  state.tutMoleT=0; if (n===1){ state.tutMoleT=1.0; state.spawnT=7; state.toSpawn--; }
+  if ((n-1)%LEVELS.length===2) setTimeout(()=>tut('jump',TX('Space om te spring. Klim op die pawiljoen as dit warm raak!','Space to jump. Climb the stands when it gets hot!'),7),4000);
   const round=Math.floor((n-1)/LEVELS.length);
   showMsg(def.name,3); sfx.wave(); showToast(round>0?TX(`Ronde ${round+1}: die molle is kwater`,`Round ${round+1}: the moles are angry`):def.blurb(),4);
   updateHUD();
@@ -1166,7 +1248,7 @@ function fadeTo(fn){
   setTimeout(()=>{ fn(); $('fade').style.opacity=0; state.transition=false; },650);
 }
 function refill(){ for(const id of ['dubbel','pomp','r4']) if(owned[id]) reserve[id]=Math.min(resMax(id),reserve[id]+AMMO_BOX[id]); state.reloading=0; }
-function resetRun(mode){
+function resetRun(mode,noVault){
   owned={pistol:true,dubbel:true,pomp:false,r4:false}; up={maxhp:0,speed:0,pistol:0,dubbel:0,pomp:0,r4:0,bag:0}; items={turret:0,mower:0,medkit:0};
   hasDog=false; if(dog){ scene.remove(dog.root); dog=null; }
   cur='dubbel'; seenTypes=new Set();
@@ -1177,6 +1259,10 @@ function resetRun(mode){
   $('fade').style.opacity=0; $('over').hidden=true; $('start').hidden=true; $('pause').hidden=true; $('shop').hidden=true; $('hud').hidden=false;
   if (mode==='campaign') startLevel(1);
   else { state.sceneIdx=Math.floor(Math.random()*LEVELS.length); buildScene(state.sceneIdx); setWave(1); showToast(TX('Hoe lank hou jy uit? Elke 5 golwe skuif jy na ’n nuwe plek.','How long can you last? Every 5 waves you move to a new place.'),4); }
+  combo=0; comboT=0; bestCombo=0; hitStop=0; slowMo=0; state.intro=false;
+  if (!noVault) openVaultStart();
+}
+function openVaultStart(){
   if (kluis.rand>0 || kluisCount()>0) openShop(TX('Pak jou rugsak voor jy begin. Wat jy nie vat nie, bly veilig in die kluis.','Pack your backpack before you start. Whatever you leave stays safe in the vault.'),null,{kluisOnly:true});
 }
 function score(){ return state.earned + (state.mode==='campaign' ? (state.level-1)*100 : (state.wave-1)*50); }
@@ -1186,7 +1272,8 @@ function gameOver(){
   if (document.pointerLockElement) document.exitPointerLock();
   const n=state.mode==='campaign'?state.level:state.wave;
   const reach = state.mode==='campaign' ? TX('vlak','level')+' '+n : TX('golf','wave')+' '+n;
-  $('overStats').textContent=TX(`Telling ${score()}. Jy het ${reach} gehaal en ${state.kills} molle geklap.`,`Score ${score()}. You reached ${reach} and klapped ${state.kills} moles.`);
+  $('overStats').textContent=TX(`Telling ${score()}. Jy het ${reach} gehaal en ${state.kills} molle geklap. Beste kombo: x${bestCombo}.`,`Score ${score()}. You reached ${reach} and klapped ${state.kills} moles. Best combo: x${bestCombo}.`);
+  $('tut').style.opacity=0; tutKey=null; $('combo').style.opacity=0;
   lastEntry={score:score(),n,kills:state.kills,t:Date.now(),mode:state.mode};
   $('nameRow').hidden=false; $('saveScore').disabled=false;
   renderLB($('overBoard'),getLB(state.mode),10);
@@ -1212,22 +1299,23 @@ function setPaused(p){ if(!state.playing||state.inShop) return; state.paused=p; 
 const ray=new THREE.Raycaster(); ray.far=70; const v2=new THREE.Vector2();
 function shoot(){
   if (!state.playing || state.paused || state.inShop || state.transition || driving || state.switching>0 || state.fireCd>0) return;
-  const w=W[cur];
+  const w=W[cur]; tutComplete('shoot');
   if (state.reloading>0){ if (w.perShell && ammo[cur]>0) state.reloading=0; else return; }
   if (ammo[cur]<=0){ sfx.dry(); state.fireCd=0.25; updateAmmoPrompt(); return; }
   ammo[cur]--; state.fireCd=w.cd; state.recoil=w.kick; state.flashT=0.05; state.shake=Math.min(0.4,state.shake+w.shake);
   sfx.fire(cur); if (w.pump){ state.pumpT=w.cd; setTimeout(sfx.pump,250); }
   const list=moles.filter(m=>m.state!=='dying'&&m.g.visible).map(m=>m.g).concat(solids);
-  const hits=new Map(), dmg=dmgOf(cur); let headHit=false;
+  const hits=new Map(), dmg=dmgOf(cur), headMoles=new Set(); let headHit=false;
   for (let i=0;i<w.pellets;i++){
     v2.set((Math.random()-.5)*w.spread*2,(Math.random()-.5)*w.spread*2); ray.setFromCamera(v2,camera);
     const h=ray.intersectObjects(list,true);
-    if (h.length){ const m=h[0].object.userData.mole; if (m){ const hd=!!h[0].object.userData.head; if(hd) headHit=true; hits.set(m,(hits.get(m)||0)+dmg*(hd?1.75:1)); if(Math.random()<0.5) dirtBurst(h[0].point,2); } else if (Math.random()<0.5) dirtBurst(h[0].point,1); }
+    if (h.length){ const m=h[0].object.userData.mole; if (m){ const hd=!!h[0].object.userData.head; if(hd){ headHit=true; headMoles.add(m); } hits.set(m,(hits.get(m)||0)+dmg*(hd?1.75:1)); if(Math.random()<0.5) dirtBurst(h[0].point,2); } else if (Math.random()<0.5) dirtBurst(h[0].point,1); }
     else if (groundMesh){ const gh=ray.intersectObject(groundMesh); if (gh.length && Math.random()<0.5) dirtBurst(gh[0].point,1); }
   }
   const dir=new THREE.Vector3(); camera.getWorldDirection(dir);
+  hits.forEach((n,m)=>dmgNumber(m,n,headMoles.has(m)));
   hits.forEach((n,m)=>damageMole(m,n,dir));
-  if (hits.size){ let killed=false; hits.forEach((n,m)=>{ if(m.state==='dying') killed=true; }); showHit(killed?'kill':headHit?'head':''); if(headHit) sfx.headshot(); }
+  if (hits.size){ let killed=false; hits.forEach((n,m)=>{ if(m.state==='dying') killed=true; }); showHit(killed?'kill':headHit?'head':''); if(headHit){ sfx.headshot(); hitStop=Math.max(hitStop,0.05); } }
   updateHUD();
 }
 function reload(){
@@ -1241,10 +1329,10 @@ function switchWeapon(id){
   cur=id; state.reloading=0; state.switching=0.3; state.fireCd=0; state.pumpT=0; sfx.click(); updateHUD();
 }
 function cycleWeapon(dir){ const own=ORDER.filter(id=>owned[id]); const i=own.indexOf(cur); switchWeapon(own[(i+dir+own.length)%own.length]); }
-function hurtPlayer(n){ if(!state.playing) return; state.hp-=n; state.hurt=1; state.shake=Math.min(0.5,state.shake+0.3); sfx.hurt(); updateHUD(); if(state.hp<=0) gameOver(); }
+function hurtPlayer(n,from){ if(!state.playing) return; if(from) showDmgDir(from); state.hp-=n; if(state.hp<60 && state.hp>0) tut('heal',TX('Laag op lewe? Soek die groen ringe: noodhulpkissies.','Low on health? Look for the green rings: first aid kits.'),6); state.hurt=1; state.shake=Math.min(0.5,state.shake+0.3); sfx.hurt(); updateHUD(); if(state.hp<=0) gameOver(); }
 
 // ---------- Input ----------
-function active(){ return state.playing && !state.paused && !state.inShop && !state.transition; }
+function active(){ return state.playing && !state.paused && !state.inShop && !state.transition && !state.intro; }
 addEventListener('keydown',e=>{
   keys[e.code]=true;
   if (['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Space'].includes(e.code)) e.preventDefault();
@@ -1277,7 +1365,21 @@ canvas.addEventListener('mousedown',e=>{
   if (locked){ holding=true; shoot(); } else if (fallback){ dragging=true; dragDist=0; } else lock();
 });
 addEventListener('mouseup',e=>{ if(e.button!==0) return; if(dragging && dragDist<6) shoot(); dragging=false; holding=false; });
-$('goCampaign').addEventListener('click',()=>{ initAudio(); resetRun('campaign'); if(!state.inShop) lock(); });
+let introOn=false;
+function playIntro(done){
+  state.intro=true; introOn=true; const el=$('intro');
+  $('intro1').textContent=TX('Oupa het altyd gesê die molle sal terugkom.','Oupa always said the moles would come back.');
+  $('intro2').textContent=TX('Vanaand het hulle.','Tonight, they did.');
+  $('introSkip').textContent=TX('Klik om oor te slaan','Click to skip');
+  el.className=''; el.style.opacity=1; el.hidden=false;
+  const t1=setTimeout(()=>el.classList.add('l1'),300), t2=setTimeout(()=>el.classList.add('l2'),1900);
+  const end=(e)=>{ if(!introOn) return; introOn=false; if(e&&e.stopPropagation){ e.stopPropagation(); e.preventDefault&&e.type==='mousedown'&&e.preventDefault(); }
+    clearTimeout(t0); clearTimeout(t1); clearTimeout(t2); document.removeEventListener('keydown',end,true); document.removeEventListener('mousedown',end,true);
+    el.style.opacity=0; setTimeout(()=>{ el.hidden=true; },600); state.intro=false; sfx.emerge(8,true); if(done) done(); };
+  const t0=setTimeout(end,4400);
+  setTimeout(()=>{ if(introOn){ document.addEventListener('keydown',end,true); document.addEventListener('mousedown',end,true); } },350);
+}
+$('goCampaign').addEventListener('click',()=>{ initAudio(); resetRun('campaign',true); lock(); playIntro(openVaultStart); });
 $('goEndless').addEventListener('click',()=>{ initAudio(); resetRun('endless'); if(!state.inShop) lock(); });
 $('again').addEventListener('click',()=>{ initAudio(); resetRun(lastEntry?lastEntry.mode:'campaign'); if(!state.inShop) lock(); });
 $('menu').addEventListener('click',toMenu);
@@ -1293,6 +1395,9 @@ function update(dt){
   if (toastT>0){ toastT-=dt; if(toastT<=0) $('toast').style.opacity=0; }
   if (popT>0){ popT-=dt; if(popT<=0) $('rands').classList.remove('pop'); }
   if (hitT>0){ hitT-=dt; if(hitT<=0) $('hitmark').style.opacity=0; }
+  if (tutT>0 && tutT<900){ tutT-=dt; if(tutT<=0){ $('tut').style.opacity=0; tutKey=null; } }
+  if (comboT>0){ comboT-=dt; if(comboT<=0) combo=0; }
+  { const ce=$('combo'); const on=combo>=2 && comboT>0; ce.style.opacity=on?1:0; if(on){ $('comboN').textContent='x'+combo; $('comboBar').style.transform=`scaleX(${Math.max(0,comboT/COMBO_WIN)})`; } }
   if (boomLight.intensity>0) boomLight.intensity=Math.max(0,boomLight.intensity-dt*20);
   for (const p of pickups){ p.t+=dt; p.obj.rotation.y+=dt*1.5; p.obj.position.y=0.6+Math.sin(p.t*2)*0.12; }
 
@@ -1335,13 +1440,18 @@ function update(dt){
         if (state.hp>=state.maxHp){
           if (bagCount()<bagCap()){ items.medkit++; showToast(TX('Health bar is full. Noodhulpkissie in jou rugsak gesit.','Health bar is full. First aid kit put in your backpack.'),2.2,'var(--heal)'); }
           else { noteOnce('hp',TX('Health bar is full (rugsak is vol)','Health bar is full (backpack is full)'),'var(--heal)'); continue; } }
-        else { state.hp=Math.min(state.maxHp,state.hp+35); showToast(TX('Noodhulpkissie: +35 lewe','First aid kit: +35 health'),1.8,'var(--heal)'); } }
+        else { tutComplete('heal'); state.hp=Math.min(state.maxHp,state.hp+35); showToast(TX('Noodhulpkissie: +35 lewe','First aid kit: +35 health'),1.8,'var(--heal)'); } }
       else { owned[p.id]=true; ammo[p.id]=magOf(p.id); if(p.id!=='pistol') reserve[p.id]=Math.max(reserve[p.id],AMMO_BOX[p.id]*2); switchWeapon(p.id); showToast(TX(`${W[p.id].name} gekry! Druk ${W[p.id].slot}`,`Got the ${W[p.id].name}! Press ${W[p.id].slot}`),3,'var(--ember)'); }
       sfx.pickup(); levelGroup.remove(p.root); pickups.splice(i,1); updateHUD(); } }
 
   { let txt=''; if (driving) txt=TX('F: klim uit','F: get out'); else if (nearCar()) txt=TX('Druk F om in die bakkie te klim','Press F to get in the bakkie'); else if (nearSafe()) txt=TX('Druk E vir die kluis','Press E for the vault');
     const el=$('interact'); if (el.textContent!==txt) el.textContent=txt; el.hidden=!txt; }
   // spawning, clearing
+  if (state.tutMoleT>0){ state.tutMoleT-=dt; if (state.tutMoleT<=0){
+      const f={x:player.x-Math.sin(yaw)*9,z:player.z-Math.cos(yaw)*9,exact:true};
+      if (spawnMole('normal',f)){ const tm=moles[moles.length-1]; tm.speed=1.3; tm.hp=2; tut('shoot',TX('Klik om te skiet. Mik vir die kop!','Click to shoot. Aim for the head!'),999); } else state.toSpawn++; } }
+  if (tutDone.shoot && !tutDone.move && !tutShown.move && state.kills>=1){ tut('move',TX('WASD om te beweeg, Shift om te hardloop','WASD to move, Shift to run'),999); tutMoveFrom={x:player.x,z:player.z}; }
+  if (tutKey==='move' && tutMoveFrom && Math.hypot(player.x-tutMoveFrom.x,player.z-tutMoveFrom.z)>4) tutComplete('move');
   if (!state.cleared){
     const d=diff();
     if (state.toSpawn>0){ state.spawnT-=dt;
@@ -1368,7 +1478,7 @@ function update(dt){
   // projectiles
   for (let i=projectiles.length-1;i>=0;i--){ const pr=projectiles[i]; pr.life-=dt; pr.v.y-=14*dt; pr.mesh.position.addScaledVector(pr.v,dt); pr.mesh.rotation.x+=dt*6;
     const pp=pr.mesh.position;
-    if (Math.hypot(pp.x-player.x,pp.z-player.z)<0.75 && pp.y>player.feet+0.3 && pp.y<player.feet+2.1){ hurtPlayer(pr.dmg); dirtBurst(pp,6); scene.remove(pr.mesh); projectiles.splice(i,1); if(!state.playing) return; continue; }
+    if (Math.hypot(pp.x-player.x,pp.z-player.z)<0.75 && pp.y>player.feet+0.3 && pp.y<player.feet+2.1){ hurtPlayer(pr.dmg,pp); dirtBurst(pp,6); scene.remove(pr.mesh); projectiles.splice(i,1); if(!state.playing) return; continue; }
     if (pp.y<0.1 || pr.life<=0){ dirtBurst(pp,4); scene.remove(pr.mesh); projectiles.splice(i,1); } }
 
   // turrets
@@ -1432,12 +1542,16 @@ function update(dt){
       if (m.cd>0) m.cd-=dt;
       if (m.type==='bom' && dist<2.3){ m.state='fuse'; m.fuse=0.9; m.beepT=0; continue; }
       if (m.type==='grawer'){ m.surfT+=dt; if (m.surfT>3.5){ m.state='burrow'; m.t2=0; continue; } }
-      if (dist<0.75*m.s+(driving?1.9:0.65) && m.cd<=0 && player.feet<(m.boss?2.2:1.0) && !(driving&&Math.abs(vehicle.speed)>3)){ m.cd=m.boss?1.4:1.0; hurtPlayer(driving?Math.ceil(m.dmg/2):m.dmg); if(!state.playing) return;
+      if (dist<0.75*m.s+(driving?1.9:0.65) && m.cd<=0 && player.feet<(m.boss?2.2:1.0) && !(driving&&Math.abs(vehicle.speed)>3)){ m.cd=m.boss?1.4:1.0; hurtPlayer(driving?Math.ceil(m.dmg/2):m.dmg,p); if(!state.playing) return;
         moveBody(p,-pdx/dist*0.6,-pdz/dist*0.6,0.45*m.s); if (m.type==='grawer'){ m.state='burrow'; m.t2=0; } }
     } else {
       if (m.pendingBoom>0){ m.pendingBoom-=dt; if(m.pendingBoom<=0){ explode(m); if(!state.playing) return; } }
-      m.t2+=dt; p.y-=dt*1.6*m.s; g.rotation.z+=dt*7;
-      if (m.t2>0.8){ scene.remove(g); if(m.ownHill) scene.remove(m.ownHill); moles.splice(i,1); updateHUD(); }
+      m.t2+=dt;
+      if (m.fly && g.visible){ const f=m.fly; f.vy-=20*dt; p.x+=f.vx*dt; p.z+=f.vz*dt; p.y+=f.vy*dt; g.rotation.x+=f.sx*dt; g.rotation.z+=f.sz*dt;
+        const floor=0.3*m.s; if (p.y<floor){ p.y=floor; if (f.vy<-3){ f.vy*=-0.38; f.vx*=0.6; f.vz*=0.6; dirtBurst(p,4); if(!m.bounced){ m.bounced=true; sfx.squeak(m.boss); } } else { f.vy=0; f.vx*=0.85; f.vz*=0.85; f.sx*=0.9; f.sz*=0.9; } }
+        if (m.t2>1.4) g.scale.setScalar(m.s*Math.max(0.01,1-(m.t2-1.4)/0.4)); }
+      else { p.y-=dt*1.6*m.s; g.rotation.z+=dt*7; }
+      if (m.t2>(m.fly&&g.visible?1.8:0.8)){ scene.remove(g); if(m.ownHill) scene.remove(m.ownHill); moles.splice(i,1); updateHUD(); }
     }
   }
   setMusic(bossAlive?'boss':'calm');
@@ -1488,7 +1602,7 @@ applyGfx();
 applyLang();
 const clock=new THREE.Clock();
 let fpsFrames=0, fpsT=0; const fpsEl=$('fps');
-(function loop(){ requestAnimationFrame(loop); const raw=clock.getDelta(), dt=Math.min(raw,0.1); update(dt); if(composer) composer.render(); else renderer.render(scene,camera);
+(function loop(){ requestAnimationFrame(loop); const raw=clock.getDelta(); let dt=Math.min(raw,0.1); if(hitStop>0){ hitStop-=raw; dt=0; } else if(slowMo>0){ slowMo-=raw; dt*=0.3; } update(dt); if(composer) composer.render(); else renderer.render(scene,camera);
   fpsFrames++; fpsT+=raw; if(fpsT>=0.5){ fpsEl.textContent=Math.round(fpsFrames/fpsT)+' fps'; fpsFrames=0; fpsT=0; } })();
 })();
 </script>
